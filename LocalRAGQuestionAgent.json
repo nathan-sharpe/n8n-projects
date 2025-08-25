@@ -1,0 +1,373 @@
+{
+  "name": "Local RAG Testing",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        16,
+        960
+      ],
+      "id": "b85d51fc-cdfa-4e8b-b409-3ee4407f3848",
+      "name": "Embeddings Ollama2",
+      "credentials": {
+        "ollamaApi": {
+          "id": "re5DpBeewJhXuZ61",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        752
+      ],
+      "id": "a3804abd-cf88-4ece-b39d-052b8de041e7",
+      "name": "Postgres PGVector Store",
+      "credentials": {
+        "postgres": {
+          "id": "j6Wxcj9tOSdUFiWx",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        960
+      ],
+      "id": "35102382-12a3-459f-90ad-2436da29a394",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        352,
+        1168
+      ],
+      "id": "9d237a24-a2c4-4edb-a96f-0957e108f351",
+      "name": "Recursive Character Text Splitter1"
+    },
+    {
+      "parameters": {
+        "content": "Data Ingestion",
+        "height": 640,
+        "width": 928,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -304,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "c1ff0fe7-a1be-469d-9347-256ce31dff31",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "formTitle": "PDFs",
+        "formDescription": "Add PDFS to Embed",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "PDF",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -192,
+        768
+      ],
+      "id": "c00ea058-5c62-43a5-abd5-f3051402849d",
+      "name": "On form submission",
+      "webhookId": "c25e9a1f-53e9-4ff0-812a-71e215e525ad"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        736
+      ],
+      "id": "09f10962-cc9c-4e50-9cae-5b04f592cd3c",
+      "name": "When chat message received",
+      "webhookId": "9815f5bf-1de1-4eb9-8ef3-3bcbf2f0230b"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "typeVersion": 1.6,
+      "position": [
+        1008,
+        736
+      ],
+      "id": "2d574580-63b3-4c5f-b1ec-3e8e39b10d91",
+      "name": "Question and Answer Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        896,
+        944
+      ],
+      "id": "f7188abb-ab68-4cea-9277-e1701204a569",
+      "name": "Ollama Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "re5DpBeewJhXuZ61",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        928
+      ],
+      "id": "10d8216a-cdea-4a76-be75-bf73a38fde3b",
+      "name": "Vector Store Retriever"
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        1264
+      ],
+      "id": "d404e9b8-b105-4b5d-a696-5c2d9e5214cb",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "re5DpBeewJhXuZ61",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        1056,
+        1088
+      ],
+      "id": "98d987ea-4608-45e8-a956-9af98d196e7f",
+      "name": "Postgres PGVector Store1",
+      "credentials": {
+        "postgres": {
+          "id": "j6Wxcj9tOSdUFiWx",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Question Answering",
+        "height": 704,
+        "width": 896,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        672,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "4c0d8b20-63ab-49e8-a0dd-144a9f5aa996",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.response }}",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        736
+      ],
+      "id": "a9d65a61-c7aa-48cf-b061-bdbc45035abd",
+      "name": "Respond to Chat"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Embeddings Ollama2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store": {
+      "main": [
+        []
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Retriever": {
+      "ai_retriever": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_retriever",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Retriever",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Question and Answer Chain": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "80d3ec08-a35e-46b5-b243-18fd61756465",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0de3fc8a70a3e3d14300d317805dfa62bb2f85df5d9239050342f89e3cf64508"
+  },
+  "id": "peLzTPwleJOMiHDo",
+  "tags": []
+}

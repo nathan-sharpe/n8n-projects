@@ -1,0 +1,11 @@
+# Ignore local environment secrets
+.env
+
+# Ignore VS Code specific files
+.vscode/
+
+# Ignore Operating System files
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
