@@ -1,0 +1,1536 @@
+{
+  "name": "Advanced RAG Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1088,
+        32
+      ],
+      "id": "b4112f41-619c-405c-a3c9-ff9d5e7d3303",
+      "name": "When chat message received",
+      "webhookId": "71fe331a-b74a-4541-a8e1-19b8d4a53097"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "You field questions from users about information in your attached Supabase vector store, search for relevant results in your attached Supabase vector store and then answer using only that data. If you cannot find relevant data, or no information is returned, answer \"I do not know\"."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        32
+      ],
+      "id": "8504c47e-a78f-4bb4-9984-59ddb1cf803c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        240
+      ],
+      "id": "c7451f39-1f4c-4b09-b26b-10e4f3e91f80",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "14d1G5VWd62WJRMy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -384,
+        272
+      ],
+      "id": "dbf6c892-24c1-41b9-a0b6-83405a1e71cb",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "j6Wxcj9tOSdUFiWx",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Retrieve data from the vector store to answer the user's questions",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "company_name",
+                "value": "={{ $('Generate Metadata to Filter').item.json.output.company_name }}"
+              },
+              {
+                "name": "company_department",
+                "value": "={{ $('Generate Metadata to Filter').item.json.output.company_department }}"
+              },
+              {
+                "name": "year_covered",
+                "value": "={{ $('Generate Metadata to Filter').item.json.output.year_covered }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -272,
+        368
+      ],
+      "id": "d9208f1c-5dd1-4bd8-a724-536fa2598c62",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uyXSIwZqyd51gt1M",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        576
+      ],
+      "id": "0f5cace2-3c30-4ca5-938c-a60c8a406d1e",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "re5DpBeewJhXuZ61",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        3504,
+        16
+      ],
+      "id": "2caafcaf-01fe-4cfb-b690-9b171a80191d",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uyXSIwZqyd51gt1M",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        3472,
+        352
+      ],
+      "id": "c90bb8c1-ea78-47a2-a160-467aa9cbb973",
+      "name": "Embeddings Ollama1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "re5DpBeewJhXuZ61",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file_id",
+                "value": "={{ $('Download file').item.json.id }}"
+              },
+              {
+                "name": "file_name",
+                "value": "={{ $('Download file').item.json.name }}"
+              },
+              {
+                "name": "file_added_to_drive",
+                "value": "={{ $('Download file').item.json.createdTime }}"
+              },
+              {
+                "name": "file_last_modified",
+                "value": "={{ $('Download file').item.json.modifiedTime }}"
+              },
+              {
+                "name": "file_type",
+                "value": "={{ $('Download file').item.json.fullFileExtension }}"
+              },
+              {
+                "name": "company_name",
+                "value": "={{ $('Generate Metadata').item.json.output.company_name }}"
+              },
+              {
+                "name": "company_department",
+                "value": "={{ $('Generate Metadata').item.json.output.company_department }}"
+              },
+              {
+                "name": "year_covered",
+                "value": "={{ $('Generate Metadata').item.json.output.year_covered }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        3632,
+        256
+      ],
+      "id": "3bc0392d-4c5b-4006-ac5c-bfd604ea9e3c",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        3744,
+        432
+      ],
+      "id": "abe5923a-364a-43f9-bb6b-bf33cf086a8a",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        720,
+        32
+      ],
+      "id": "3ea9e8f1-a172-4df4-b26a-3ca0a188850d",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "69Y5VGmKV9QxHVkS",
+          "name": "Google Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        2800,
+        16
+      ],
+      "id": "85fd61cf-168a-495f-b865-bee586f67559",
+      "name": "Extract Text"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8d819ffc-7bf2-4969-a4d7-651cc0bb5708",
+              "name": "content",
+              "value": "={{ $('Extract Text').item.json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3312,
+        16
+      ],
+      "id": "865a4a76-2665-41ce-9e89-bae5d980a92e",
+      "name": "Clean Metadata"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "record_manager",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "google_drive_file_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Download file').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        32
+      ],
+      "id": "7eb20ac9-317e-4919-82b8-4ac988ae35b8",
+      "name": "Search Record Manager",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uyXSIwZqyd51gt1M",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "record_manager",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "google_drive_file_id",
+              "fieldValue": "={{ $('File(s) Created').item.json.id }}"
+            },
+            {
+              "fieldId": "hash",
+              "fieldValue": "={{ $('Generate Hash').item.json.hash }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        16
+      ],
+      "id": "8f5017a1-8378-4c32-843e-d12723d4bc73",
+      "name": "Create Row in Record Manager",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uyXSIwZqyd51gt1M",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "type": "SHA256",
+        "binaryData": true,
+        "dataPropertyName": "hash"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        944,
+        32
+      ],
+      "id": "15fc10b6-d79d-498b-a80c-8848913544b3",
+      "name": "Generate Hash"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "59374ea5-b0bd-4daa-9013-db36723814bd"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "New File"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4363d9b8-27ee-4111-9224-8ecaa579f12a",
+                    "leftValue": "={{ $json.hash }}",
+                    "rightValue": "={{ $('Generate Hash').item.json.hash }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Unchanged File"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8f91536f-a2c3-4cb7-a923-d5ed60cd3228",
+                    "leftValue": "={{ $json.hash }}",
+                    "rightValue": "={{ $('Generate Hash').item.json.hash }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Updated File"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1424,
+        32
+      ],
+      "id": "ea07edf8-e5da-4eb6-8e7f-2dfc110577e9",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Download file').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2608,
+        16
+      ],
+      "id": "bb27aef6-0db2-423c-9735-d7dc97eadb14",
+      "name": "Grab Binary",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "69Y5VGmKV9QxHVkS",
+          "name": "Google Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "documents",
+        "filterType": "string",
+        "filterString": "=metadata->>file_id=like.*{{ $('Download file').item.json.id }}*"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        336
+      ],
+      "id": "d410137e-f416-4f3c-80de-3ca73f7a6bc1",
+      "name": "Delete Previous Vectors",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uyXSIwZqyd51gt1M",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "record_manager",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Search Record Manager').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "hash",
+              "fieldValue": "={{ $('Generate Hash').item.json.hash }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        336
+      ],
+      "id": "00918d2a-730b-4477-b537-406f556a0495",
+      "name": "Update Record Manager",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uyXSIwZqyd51gt1M",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1904,
+        336
+      ],
+      "id": "5723305e-6b57-4d5e-99c8-7999ce9fe8f3",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        480,
+        32
+      ],
+      "id": "460e0bd0-ef54-46c3-a40f-e1f806c97b49",
+      "name": "Loop Over Files"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "14ZHDe4Sup7W0s1Aa1U_JdyKsVhpd0otC",
+          "mode": "list",
+          "cachedResultName": "n8n-docs",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/14ZHDe4Sup7W0s1Aa1U_JdyKsVhpd0otC"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        272,
+        32
+      ],
+      "id": "64e67e6f-ebe5-4070-89c6-cf933bfb4a37",
+      "name": "File(s) Created",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "69Y5VGmKV9QxHVkS",
+          "name": "Google Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        2944,
+        224
+      ],
+      "id": "3d74854d-7893-44fb-b58d-ae0507fb437e",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "re5DpBeewJhXuZ61",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\"company_name\": \"Nike\",\n\"company_department\": \"Production\",\n\"year_covered\": \"2019\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3152,
+        224
+      ],
+      "id": "01fd200e-20b0-4b07-9358-9c3cfcc47c2e",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# File Name\n{{ $('Download file').item.json.name }}\n\n##############################################################\n\n# File Contents\n{{ $json.text.split(' ').slice(0, 500).join(' ') + '...' }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You recieive company reports and classify them based on company name, company department, and the year that the report covers. You then output these fields in JSON in the following format only:\n\n{\n\"company_name\": \"<ADD>\",\n\"company_department\": \"<ADD>\",\n\"year_covered\": \"<ADD>\"\n}\n\nIf you are unsure of or cannot find these values in the provided context, set the value of that field to N/A.\n\nAllowable values for company_department include:\nFinance\nProduction\nInventory\nMarketing\n\nCRITICAL: Begin your response immediately with { and end with }. Do not include any other text."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        3008,
+        16
+      ],
+      "id": "2423685a-9c46-4ec0-8b61-f8d908711fe1",
+      "name": "Generate Metadata"
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        240
+      ],
+      "id": "fe156d90-43c6-4556-86e2-aa45ae7aebf7",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "re5DpBeewJhXuZ61",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\"company_name\": \"Nike\",\n\"company_department\": \"Production\",\n\"year_covered\": \"2019\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -832,
+        224
+      ],
+      "id": "645f60c2-23ce-4124-9565-c75e7c415ee5",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        3104,
+        416
+      ],
+      "id": "adca44dc-a4cb-4ce9-92ad-402efa01db55",
+      "name": "Ollama Chat Model2",
+      "credentials": {
+        "ollamaApi": {
+          "id": "re5DpBeewJhXuZ61",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        416
+      ],
+      "id": "232ee6b5-1a49-4022-b672-ad7ff1e22d10",
+      "name": "Ollama Chat Model3",
+      "credentials": {
+        "ollamaApi": {
+          "id": "re5DpBeewJhXuZ61",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You recieive queries about company reports and classify them based on company name, company department, and the year that the report covers. You then output these fields in JSON in the following format only:\n\n{\n\"company_name\": \"<ADD>\",\n\"company_department\": \"<ADD>\",\n\"year_covered\": \"<ADD>\"\n}\n\nIf you are unsure of or cannot find these values in the provided context, set the value of that field to N/A.\n\nAllowable values for company_department include:\nFinance\nProduction\nInventory\nMarketing\n\nCRITICAL: Begin your response immediately with { and end with }. Do not include any other text."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -912,
+        32
+      ],
+      "id": "88c07438-84f6-4704-af45-728da62d7dd4",
+      "name": "Generate Metadata to Filter"
+    },
+    {
+      "parameters": {
+        "content": "## Question Answering with Metadata Filtering",
+        "height": 800,
+        "width": 1296,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1200,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "8fc12252-7680-47ee-95b3-dc0589bf7106",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## User sends a query about the company documents that is first evaluated for the company name, company department and year of interest. If any are not present, \"N/A\" is populated instead. These fields become metadata filters to match against the vector store's fields with the same name to create more relevant, accurate answers.",
+        "height": 128,
+        "width": 1296
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1200,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "b9b1b0a9-53e7-4920-9620-86cd1ab13432",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Data Ingestion with Vector Store Management",
+        "height": 800,
+        "width": 3776,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        144,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "51189b3b-0a68-4447-b477-9deae39733d5",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Google Drive folder is polled each minute to see if any files have been added or updated",
+        "height": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        144,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "fff7021a-d957-4021-ab42-4c3cd7acd7e6",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Each added or updated file is treated as a loop item that is processed one by one",
+        "height": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        416,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "0ae5fa21-f678-47a8-b1f6-800587646d0a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## The file is downloaded in binary form",
+        "height": 128,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        672,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "dd244caf-bad9-44e3-b750-6053d9fccb4b",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## A unique hash value is created from the file's content and attached to the file as a property called hash",
+        "height": 288,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        896,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "9a32d55d-d428-474d-98f5-0ada4db53f11",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## The record manager table in Supabase is queried to see if any rows (files) exist with the same Google Drive File ID as the passed in file. These rows are returned or an empty array is returned if there are none",
+        "height": 496,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1120,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "49de8df2-d095-4fa8-817a-0feaf66b49f4",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## New File:\nIf an empty array is returned no files with this Google Drive File ID exist in our db, therefore this is a new file that should be processed and ingested.\n\n## Unchanged File:\nIf a row is returned with the same Google Drive File ID and the same hash value, this file already exists and has not been changed since ingestion, therefore it should not be added and the loop restarts.\n\n## Updated File:\nIf a row is returned with the same Google Drive File ID but a different hash, this file has been ingested but has been updated since ingestion and therefore should be reprocessed and reingested, and the existing associated vectors should be deleted.",
+        "height": 656,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1360,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "ea5fe21c-4f65-4748-842f-ddc33141d6ef",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Locate all chunks that have the same Google Drive File ID as the updated file (metadata property) and delete them",
+        "height": 320,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1600,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "da5d56b8-1475-4ce2-a1e1-03d3c632c069",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Take the returned chunks from the previous step and aggregate them into a single item. This is a bit of an n8n quirk and not too important.",
+        "height": 384,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1840,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "43640954-8290-47bc-8b23-c1744d277514",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Update the record manager row for the updated file with the new hash value that reflects the changes that have been made.",
+        "height": 352,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2080,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "c554da8a-315f-48ec-97e1-189a242094dc",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Add a row to the record manager table that contains the new files Google Drive File ID and hash value.",
+        "height": 288,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2304,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "be977a9d-5084-4054-b7fc-8aa5baede1a0",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## Grab the binary for the file so that the text can be extracted in the next step.",
+        "height": 224,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2528,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "b591ca95-2a29-4956-8fb3-b72e8d1db09f",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Extract the text from the binary file",
+        "height": 128,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2752,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "218b0a2a-b30f-4b89-9351-e890fe69661d",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## Based on the first 500 words of the file (adjust as needed by changing the slice value of the file contents), generate values for the company name, company department and year covered.",
+        "height": 512,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2976,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "31863271-4d54-4ab5-a946-ed44361d7339",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "## Populate a field called content with the text of the file to be passed to the vector store for embedding without passing unwanted metadata that will create more noise. Desired source metadata will be added in the data loader.",
+        "height": 544,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3216,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "83e8f77d-cc87-4d03-850a-61631d566bcb",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "## Chunk and embed the files contents into the vector store while also attaching desired metadata to each chunk for improved accuracy of retrieval. The company name and department, as well as year covered values are attached to each chunk here as well as file name, file id, when the file was added to drive, when the file was last modified, and any other fields you desire.",
+        "height": 384,
+        "width": 432
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3456,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "050ecebf-43c6-49ec-b65b-722628164620",
+      "name": "Sticky Note17"
+    }
+  ],
+  "pinData": {
+    "File(s) Created": [
+      {
+        "json": {
+          "parents": [
+            "14ZHDe4Sup7W0s1Aa1U_JdyKsVhpd0otC"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Nathan Sharpe",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "06690821412183680653",
+            "emailAddress": "sharpenn@mail.uc.edu",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocIZmPltmGz4K55kRRuGbEi5MiC1EOswJQlGMDoX_uJE8m2LiQ=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Nathan Sharpe",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "06690821412183680653",
+              "emailAddress": "sharpenn@mail.uc.edu",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocIZmPltmGz4K55kRRuGbEi5MiC1EOswJQlGMDoX_uJE8m2LiQ=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "06690821412183680653",
+              "type": "user",
+              "emailAddress": "sharpenn@mail.uc.edu",
+              "role": "owner",
+              "displayName": "Nathan Sharpe",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocIZmPltmGz4K55kRRuGbEi5MiC1EOswJQlGMDoX_uJE8m2LiQ=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "06690821412183680653"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "1tyN3W7eD9UrSckGCJPGrJMcULUF8kaEh",
+          "name": "Innovatech_Finance_2021.pdf",
+          "mimeType": "application/pdf",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "8",
+          "webContentLink": "https://drive.google.com/uc?id=1tyN3W7eD9UrSckGCJPGrJMcULUF8kaEh&export=download",
+          "webViewLink": "https://drive.google.com/file/d/1tyN3W7eD9UrSckGCJPGrJMcULUF8kaEh/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/pdf",
+          "hasThumbnail": true,
+          "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/AJQWtBPqVppmqP0pDOPA64E3NE1_F-gf6lhWCiqXDlxjU88bov4vNWbiNDp7uhmhB_ZrJGkSvyke5jCl74CyyAXfKqGaE3NpP1VOV60dZRjcF5lUOoI=s220",
+          "thumbnailVersion": "1",
+          "viewedByMe": true,
+          "viewedByMeTime": "2025-09-01T21:24:37.392Z",
+          "createdTime": "2025-09-01T21:23:38.239Z",
+          "modifiedTime": "2025-09-01T18:51:10.000Z",
+          "modifiedByMeTime": "2025-09-01T18:51:10.000Z",
+          "modifiedByMe": true,
+          "shared": false,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "Innovatech_Finance_2021.pdf",
+          "fullFileExtension": "pdf",
+          "fileExtension": "pdf",
+          "md5Checksum": "3e0c5f0e5ab5bd823fd7e5dd475e5358",
+          "sha1Checksum": "ec30a9dbf2bde2a421c9fe0434112bd704db9434",
+          "sha256Checksum": "4b8334ba2d205565b2f6bd61feec4b7b18af6200344c549fb727f8e55f799c15",
+          "size": "112489",
+          "quotaBytesUsed": "112489",
+          "headRevisionId": "0B9dvqUp2rPYkRTg0WWcwNUxlY2pvNHN1WTVINWk5NkVpWFhJPQ",
+          "isAppAuthorized": false,
+          "inheritedPermissionsDisabled": false
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Generate Metadata to Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Generate Hash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text": {
+      "main": [
+        [
+          {
+            "node": "Generate Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Metadata": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Record Manager": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Row in Record Manager": {
+      "main": [
+        [
+          {
+            "node": "Grab Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Hash": {
+      "main": [
+        [
+          {
+            "node": "Search Record Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Create Row in Record Manager",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Files",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete Previous Vectors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grab Binary": {
+      "main": [
+        [
+          {
+            "node": "Extract Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Previous Vectors": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Record Manager": {
+      "main": [
+        [
+          {
+            "node": "Grab Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Update Record Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Files": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File(s) Created": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Metadata",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate Metadata",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Metadata": {
+      "main": [
+        [
+          {
+            "node": "Clean Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Metadata to Filter",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate Metadata to Filter",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Metadata to Filter": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "36385685-ca52-42de-8953-4e71435fd99b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0de3fc8a70a3e3d14300d317805dfa62bb2f85df5d9239050342f89e3cf64508"
+  },
+  "id": "NbepzMByLfQA9P1H",
+  "tags": []
+}
